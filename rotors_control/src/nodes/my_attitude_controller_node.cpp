@@ -53,6 +53,7 @@ AttitudeControllerNode::AttitudeControllerNode()
     if (enable_minifly_controller_) {
         cmd_get_target_attitude_sub_ = nh.subscribe(mav_msgs::default_topics::COMMAND_ROLL_PITCH_YAWRATE_THRUST, 1,
             &AttitudeControllerNode::TargetAttitudeCallback, this);
+        // ROS_INFO("Got param 'enable_minifly_controller_': %d", enable_minifly_controller_);
 
         odometry_sub_
             = nh.subscribe(mav_msgs::default_topics::ODOMETRY, 1, &AttitudeControllerNode::OdometryCallback, this);
@@ -84,32 +85,25 @@ AttitudeControllerNode::AttitudeControllerNode()
 
 AttitudeControllerNode::~AttitudeControllerNode() { }
 
-void AttitudeControllerNode::TargetAttitudeCallback(const mav_msgs::EigenRollPitchYawrateThrust& msg)
+void AttitudeControllerNode::TargetAttitudeCallback(const mav_msgs::RollPitchYawrateThrust& msg)
 {
     // Clear all pending commands.
-    command_timer_.stop();
-    commands_.clear();
-    command_waiting_times_.clear();
-
-    const size_t n_commands = msg->points.size();
-
-    if (n_commands < 1) {
-        ROS_WARN_STREAM("Got MultiDOFJointTrajectory message, but message has no points.");
-        return;
-    }
+    // command_timer_.stop();
+    // commands_.clear();
+    // command_waiting_times_.clear();
 
     mav_msgs::EigenRollPitchYawrateThrust eigen_reference;
-    mav_msgs::eigenRollPitchYawrateThrustFromMsg(msg->points.front(), &eigen_reference);
-    commands_.push_front(eigen_reference);
+    mav_msgs::eigenRollPitchYawrateThrustFromMsg(msg, &eigen_reference);
+    // commands_.push_front(eigen_reference);
 
     // We can trigger the first command immediately.
     attitude_controller_.SetTargetAttitude(eigen_reference);
-    commands_.pop_front();
+    // commands_.pop_front();
 
-    if (n_commands >= 1) {
-        waypointHasBeenPublished_ = true;
-        ROS_INFO("AttitudeController got first MultiDOFJointTrajectory message.");
-    }
+    // if (n_commands >= 1) {
+    waypointHasBeenPublished_ = true;
+    ROS_INFO("AttitudeController got first TargetAttitude message.");
+    // }
 }
 
 void AttitudeControllerNode::InitializeParams()
@@ -118,37 +112,61 @@ void AttitudeControllerNode::InitializeParams()
     if (enable_minifly_controller_) {
         // TODO:GET PARAMETERS AND SET THEM
 
-        GetRosParameter(pnh, "angle_gain_kp/pitch", PidGain_AnglePitch_.kp, &PidGain_AnglePitch_.kp);
-        GetRosParameter(pnh, "angle_gain_ki/pitch", PidGain_AnglePitch_.ki, &PidGain_AnglePitch_.ki);
-        GetRosParameter(pnh, "angle_gain_kd/pitch", PidGain_AnglePitch_.kd, &PidGain_AnglePitch_.kd);
+        GetRosParameter(pnh, "angle_gain_kp/pitch", attitude_controller_.PidGain_AnglePitch_.kp,
+            &attitude_controller_.PidGain_AnglePitch_.kp);
+        GetRosParameter(pnh, "angle_gain_ki/pitch", attitude_controller_.PidGain_AnglePitch_.ki,
+            &attitude_controller_.PidGain_AnglePitch_.ki);
+        GetRosParameter(pnh, "angle_gain_kd/pitch", attitude_controller_.PidGain_AnglePitch_.kd,
+            &attitude_controller_.PidGain_AnglePitch_.kd);
 
-        GetRosParameter(pnh, "angle_gain_kp/roll", PidGain_AngleRoll_.kp, &PidGain_AngleRoll_.kp);
-        GetRosParameter(pnh, "angle_gain_ki/roll", PidGain_AngleRoll_.ki, &PidGain_AngleRoll_.ki);
-        GetRosParameter(pnh, "angle_gain_kd/roll", PidGain_AngleRoll_.kd, &PidGain_AngleRoll_.kd);
+        GetRosParameter(pnh, "angle_gain_kp/roll", attitude_controller_.PidGain_AngleRoll_.kp,
+            &attitude_controller_.PidGain_AngleRoll_.kp);
+        GetRosParameter(pnh, "angle_gain_ki/roll", attitude_controller_.PidGain_AngleRoll_.ki,
+            &attitude_controller_.PidGain_AngleRoll_.ki);
+        GetRosParameter(pnh, "angle_gain_kd/roll", attitude_controller_.PidGain_AngleRoll_.kd,
+            &attitude_controller_.PidGain_AngleRoll_.kd);
 
-        GetRosParameter(pnh, "angle_gain_kp/yaw", PidGain_AngleYaw_.kp, &PidGain_AngleYaw_.kp);
-        GetRosParameter(pnh, "angle_gain_ki/yaw", PidGain_AngleYaw_.ki, &PidGain_AngleYaw_.ki);
-        GetRosParameter(pnh, "angle_gain_kd/yaw", PidGain_AngleYaw_.kd, &PidGain_AngleYaw_.kd);
+        GetRosParameter(pnh, "angle_gain_kp/yaw", attitude_controller_.PidGain_AngleYaw_.kp,
+            &attitude_controller_.PidGain_AngleYaw_.kp);
+        GetRosParameter(pnh, "angle_gain_ki/yaw", attitude_controller_.PidGain_AngleYaw_.ki,
+            &attitude_controller_.PidGain_AngleYaw_.ki);
+        GetRosParameter(pnh, "angle_gain_kd/yaw", attitude_controller_.PidGain_AngleYaw_.kd,
+            &attitude_controller_.PidGain_AngleYaw_.kd);
 
-        GetRosParameter(pnh, "rate_gain_kp/pitch", PidGain_RatePitch_.kp, &PidGain_RatePitch_.kp);
-        GetRosParameter(pnh, "rate_gain_ki/pitch", PidGain_RatePitch_.ki, &PidGain_RatePitch_.ki);
-        GetRosParameter(pnh, "rate_gain_kd/pitch", PidGain_RatePitch_.kd, &PidGain_RatePitch_.kd);
+        GetRosParameter(pnh, "rate_gain_kp/pitch", attitude_controller_.PidGain_RatePitch_.kp,
+            &attitude_controller_.PidGain_RatePitch_.kp);
+        GetRosParameter(pnh, "rate_gain_ki/pitch", attitude_controller_.PidGain_RatePitch_.ki,
+            &attitude_controller_.PidGain_RatePitch_.ki);
+        GetRosParameter(pnh, "rate_gain_kd/pitch", attitude_controller_.PidGain_RatePitch_.kd,
+            &attitude_controller_.PidGain_RatePitch_.kd);
 
-        GetRosParameter(pnh, "rate_gain_kp/roll", PidGain_RateRoll_.kp, &PidGain_RateRoll_.kp);
-        GetRosParameter(pnh, "rate_gain_ki/roll", PidGain_RateRoll_.ki, &PidGain_RateRoll_.ki);
-        GetRosParameter(pnh, "rate_gain_kd/roll", PidGain_RateRoll_.kd, &PidGain_RateRoll_.kd);
+        GetRosParameter(pnh, "rate_gain_kp/roll", attitude_controller_.PidGain_RateRoll_.kp,
+            &attitude_controller_.PidGain_RateRoll_.kp);
+        GetRosParameter(pnh, "rate_gain_ki/roll", attitude_controller_.PidGain_RateRoll_.ki,
+            &attitude_controller_.PidGain_RateRoll_.ki);
+        GetRosParameter(pnh, "rate_gain_kd/roll", attitude_controller_.PidGain_RateRoll_.kd,
+            &attitude_controller_.PidGain_RateRoll_.kd);
 
-        GetRosParameter(pnh, "rate_gain_kp/yaw", PidGain_RateYaw_.kp, &PidGain_RateYaw_.kp);
-        GetRosParameter(pnh, "rate_gain_ki/yaw", PidGain_RateYaw_.ki, &PidGain_RateYaw_.ki);
-        GetRosParameter(pnh, "rate_gain_kd/yaw", PidGain_RateYaw_.kd, &PidGain_RateYaw_.kd);
+        GetRosParameter(pnh, "rate_gain_kp/yaw", attitude_controller_.PidGain_RateYaw_.kp,
+            &attitude_controller_.PidGain_RateYaw_.kp);
+        GetRosParameter(pnh, "rate_gain_ki/yaw", attitude_controller_.PidGain_RateYaw_.ki,
+            &attitude_controller_.PidGain_RateYaw_.ki);
+        GetRosParameter(pnh, "rate_gain_kd/yaw", attitude_controller_.PidGain_RateYaw_.kd,
+            &attitude_controller_.PidGain_RateYaw_.kd);
 
-        GetRosParameter(pnh, "pos_z_gain_kp/pitch", PidGain_PosZ_.kp, &PidGain_PosZ_.kp);
-        GetRosParameter(pnh, "pos_z_gain_ki/pitch", PidGain_PosZ_.ki, &PidGain_PosZ_.ki);
-        GetRosParameter(pnh, "pos_z_gain_kd/pitch", PidGain_PosZ_.kd, &PidGain_PosZ_.kd);
+        GetRosParameter(
+            pnh, "pos_gain_kp/z", attitude_controller_.PidGain_PosZ_.kp, &attitude_controller_.PidGain_PosZ_.kp);
+        GetRosParameter(
+            pnh, "pos_gain_ki/z", attitude_controller_.PidGain_PosZ_.ki, &attitude_controller_.PidGain_PosZ_.ki);
+        GetRosParameter(
+            pnh, "pos_gain_kd/z", attitude_controller_.PidGain_PosZ_.kd, &attitude_controller_.PidGain_PosZ_.kd);
 
-        GetRosParameter(pnh, "pos_vz_gain_kp/pitch", PidGain_VelZ_.kp, &PidGain_VelZ_.kp);
-        GetRosParameter(pnh, "pos_vz_gain_ki/pitch", PidGain_VelZ_.ki, &PidGain_VelZ_.ki);
-        GetRosParameter(pnh, "pos_vz_gain_kd/pitch", PidGain_VelZ_.kd, &PidGain_VelZ_.kd);
+        GetRosParameter(
+            pnh, "vel_gain_kp/z", attitude_controller_.PidGain_VelZ_.kp, &attitude_controller_.PidGain_VelZ_.kp);
+        GetRosParameter(
+            pnh, "vel_gain_ki/z", attitude_controller_.PidGain_VelZ_.ki, &attitude_controller_.PidGain_VelZ_.ki);
+        GetRosParameter(
+            pnh, "vel_gain_kd/z", attitude_controller_.PidGain_VelZ_.kd, &attitude_controller_.PidGain_VelZ_.kd);
 
         ROS_INFO_ONCE("[Position Controller] Set controller gains and vehicle parameters");
 

@@ -51,9 +51,9 @@
    </node>
    <!-- Enable/Disable the trajectory generator - If the position_controller is activated, the hovering_example will be executed,
         otherwise the spline generator and the Mellinger's controller will be run-->
-   <node name="hovering_example_spline" pkg="rotors_gazebo" type="hovering_example_spline" output="screen" >
+   <!-- <node name="hovering_example_spline" pkg="rotors_gazebo" type="hovering_example_spline" output="screen" >
      <rosparam command="load" file="$(find rotors_gazebo)/resource/spline_trajectory.yaml" />
-   </node>
+   </node> -->
    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
    <node name="quaternion_to_rpy" pkg="rotors_gazebo" type="quaternion_to_rpy" output="screen" >

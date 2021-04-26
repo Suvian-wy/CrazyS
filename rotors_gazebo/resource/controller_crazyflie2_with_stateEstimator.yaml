@@ -1,12 +1,38 @@
-# Position controller parameters
-xy_gain_kp: {x: 4.594, y: -4.594}
-xy_gain_ki: {x: 5.72958, y: -5.72958}
-attitude_gain_kp: {phi: 1.0611, theta: 1.0611}
-attitude_gain_ki: {phi: 0.00349, theta: 0.0349}
-rate_gain_kp: {p: 1000, q: 1000, r: 1000}
-rate_gain_ki: {p: 0, q: 0, r: 95.6839}
-yaw_gain_kp: {yaw: 8.0914}
-yaw_gain_ki: {yaw: 0}
-hovering_gain_kp: {z: 70}
-hovering_gain_ki: {z: 3.15}
-hovering_gain_kd: {z: 373}    
+# # Position controller parameters
+# xy_gain_kp: {x: 4.594, y: -4.594}
+# xy_gain_ki: {x: 5.72958, y: -5.72958}
+# attitude_gain_kp: {phi: 1.0611, theta: 1.0611}
+# attitude_gain_ki: {phi: 0.00349, theta: 0.0349}
+# rate_gain_kp: {p: 1000, q: 1000, r: 1000}
+# rate_gain_ki: {p: 0, q: 0, r: 95.6839}
+# yaw_gain_kp: {yaw: 8.0914}
+# yaw_gain_ki: {yaw: 0}
+# hovering_gain_kp: {z: 70}
+# hovering_gain_ki: {z: 3.15}
+# hovering_gain_kd: {z: 373}    
+
+# angle_gain_kp: {pitch: 8   ,roll: 8   ,yaw: 20 }
+# angle_gain_ki: {pitch: 0   ,roll: 0   ,yaw: 0 }
+# angle_gain_kd: {pitch: 0   ,roll: 0   ,yaw: 1.5 }
+# rate_gain_kp:  {pitch: 300 ,roll: 300 ,yaw: 200 }
+# rate_gain_ki:  {pitch: 0   ,roll: 0   ,yaw: 18.5 }
+# rate_gain_kd:  {pitch: 6.5 ,roll: 6.5 ,yaw: 0 }
+# pos_gain_kp:   {z: 6}
+# pos_gain_ki:   {z: 0}
+# pos_gain_kd:   {z: 4.5}
+# vel_gain_kp:   {z: 100}
+# vel_gain_ki:   {z: 150}
+# vel_gain_kd:   {z: 10}
+
+angle_gain_kp: {pitch: 0   ,roll: 0   ,yaw: 0 }
+angle_gain_ki: {pitch: 0   ,roll: 0  ,yaw: 0 }
+angle_gain_kd: {pitch: 0  ,roll: 0  ,yaw: 0 }
+rate_gain_kp:  {pitch: 0 ,roll: 0 ,yaw: 0 }
+rate_gain_ki:  {pitch: 0  ,roll: 0  ,yaw: 0 }
+rate_gain_kd:  {pitch: 0,roll: 0,yaw: 0}
+pos_gain_kp:   {z: 70}
+pos_gain_ki:   {z: 3.15}
+pos_gain_kd:   {z: 373}
+vel_gain_kp:   {z: 1}
+vel_gain_ki:   {z: 0}
+vel_gain_kd:   {z: 0}

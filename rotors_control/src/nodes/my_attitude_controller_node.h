@@ -79,11 +79,11 @@ private:
     // publisher
     ros::Publisher motor_velocity_reference_pub_;
 
-    mav_msgs::EigenTrajectoryPointDeque commands_;
-    std::deque<ros::Duration>           command_waiting_times_;
-    ros::Timer                          command_timer_;
+    // mav_msgs::EigenTrajectoryPointDeque commands_;
+    // std::deque<ros::Duration>           command_waiting_times_;
+    // ros::Timer                          command_timer_;
 
-    void TargetAttitudeCallback(const mav_msgs::EigenRollPitchYawrateThrust& msg);
+    void TargetAttitudeCallback(const mav_msgs::RollPitchYawrateThrust& msg);
 
     void OdometryCallback(const nav_msgs::OdometryConstPtr& odometry_msg);
 

@@ -35,7 +35,8 @@
 //
 using namespace std;
 
-typedef struct {
+class PidParameter {
+public:
     double error;       //< error
     double prevError;   //< previous error
     double integ;       //< integral
@@ -47,6 +48,8 @@ typedef struct {
     double outputLimit; //< total PID output limit, absolute value. '0' means no limit.
     double dt;
 
+    PidParameter() { };
+    ~PidParameter() { };
     PidParameter(double err, double pError, double integral, double der, double p, double i, double d, double iL,
         double oL, double t)
         : error(err)
@@ -58,11 +61,8 @@ typedef struct {
         , kd(d)
         , iLimit(iL)
         , outputLimit(oL)
-        , dt(t)
-    {
-    }
-
-} PidParameter;
+        , dt(t) {};
+};
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 //
@@ -139,7 +139,7 @@ private:
     state_t                               state_;
 
     void RateController(double* delta_phi, double* delta_theta, double* delta_psi);
-    void AngleController(double* p_command, double* q_command);
+    void AngleController(double* p_command, double* q_command, double* r_command);
     void HoveringController(double* delta_omega);
     void ControlMixer(double* PWM_1, double* PWM_2, double* PWM_3, double* PWM_4);
     void Quaternion2Euler(double* roll, double* pitch, double* yaw) const;
