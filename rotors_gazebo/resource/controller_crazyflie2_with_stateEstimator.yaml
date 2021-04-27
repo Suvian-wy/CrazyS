@@ -24,10 +24,10 @@
 # vel_gain_ki:   {z: 150}
 # vel_gain_kd:   {z: 10}
 
-angle_gain_kp: {pitch: 0   ,roll: 0   ,yaw: 0 }
-angle_gain_ki: {pitch: 0   ,roll: 0  ,yaw: 0 }
+angle_gain_kp: {pitch: 1.0611   ,roll: 1.0611   ,yaw: 0 }
+angle_gain_ki: {pitch: 0.00349   ,roll: 0.00349  ,yaw: 0 }
 angle_gain_kd: {pitch: 0  ,roll: 0  ,yaw: 0 }
-rate_gain_kp:  {pitch: 0 ,roll: 0 ,yaw: 0 }
+rate_gain_kp:  {pitch: 1000 ,roll: 1000 ,yaw: 0 }
 rate_gain_ki:  {pitch: 0  ,roll: 0  ,yaw: 0 }
 rate_gain_kd:  {pitch: 0,roll: 0,yaw: 0}
 pos_gain_kp:   {z: 70}
